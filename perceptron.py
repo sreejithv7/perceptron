@@ -1,4 +1,3 @@
-from distutils.command.clean import clean
 import numpy as np
 import pandas as pd
 import random
@@ -80,35 +79,6 @@ def clean_data(train_data, test_data, choice):
         return train_data_1, train_data_2, train_data_3
 
     return clean_train_data, clean_test_data
-
-
-def classification_type(label_list):
-    pass
-
-
-def label_num_converter(label):
-
-
-    # if label == 'class-1':
-    #     return 1
-    # elif label == 'class-2':
-    #     return -1
-    # else:
-    #     return 0
-
-    if label == 'class-2':
-        return 1
-    elif label == 'class-3':
-        return -1
-    else:
-        return 0
-
-    if label == 'class-1':
-        return 1
-    elif label == 'class-3':
-        return -1
-    else:
-        return 0
 
 
 def accuracy_score(y_pred, y_true):
