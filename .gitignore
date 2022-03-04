@@ -4,3 +4,6 @@ CA1data.zip
 .ipynb_checkpoints
 perceptron.ipynb
 multiclass_perceptron.py
+test.data
+train.data
+perceptron_6_choices.py
