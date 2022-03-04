@@ -62,10 +62,6 @@ def clean_data(train_data, test_data, choice, positive_class=None, negative_clas
         clean_test_data[clean_test_data==positive_class] = 1
         clean_test_data[clean_test_data==negative_class] = -1
 
-        # print(len(clean_train_data))
-        # print(len(clean_test_data))
-
-
     elif choice == '2' or choice == '3':
 
         # Taking a copy of train data to prevent modification to the original data
@@ -80,8 +76,6 @@ def clean_data(train_data, test_data, choice, positive_class=None, negative_clas
         train_data_2[(train_data_2=='class-1') | (train_data_2=='class-3')] = -1
         train_data_3[train_data_3=='class-3'] = 1
         train_data_3[(train_data_3=='class-1') | (train_data_3=='class-2')] = -1
-
-        # print(train_data_1, train_data_2, train_data_3)
 
         return train_data_1, train_data_2, train_data_3
 
@@ -98,7 +92,6 @@ def label_numeric_converter(y_true):
     Returns:
         numpy array: labels converted to numeric values
     """
-    
     y_true[y_true=='class-1'] = 0
     y_true[y_true=='class-2'] = 1
     y_true[y_true=='class-3'] = 2
@@ -189,7 +182,6 @@ def perceptron_test(model_params, cleaned_test_data, multi_class=False):
             predicted_y = activation_score
         else:
             predicted_y = int(np.sign(activation_score))
-        # print('Predicted label:', predicted_y, 'Actual label:', label)
 
         # match the input data with test data, to find the index position 
         # corresponding to test data, and store the predicted values
@@ -219,14 +211,17 @@ if __name__ == '__main__':
         user_choice = get_user_choice()
 
         if user_choice == '1':
+            # Get cleaned train and test data for each binary classification
             c1_c2_train_data, c1_c2_test_data = clean_data(train_data, test_data, user_choice, 'class-1', 'class-2')
             c2_c3_train_data, c2_c3_test_data = clean_data(train_data, test_data, user_choice, 'class-2', 'class-3')
             c1_c3_train_data, c1_c3_test_data = clean_data(train_data, test_data, user_choice, 'class-1', 'class-3')
 
+            # Get predicted labels for train data for each binary classification 
             y_pred_c1_c2_train = perceptron_test(perceptron_train(c1_c2_train_data, MAX_ITER), c1_c2_train_data)
             y_pred_c2_c3_train = perceptron_test(perceptron_train(c2_c3_train_data, MAX_ITER), c2_c3_train_data)
             y_pred_c1_c3_train = perceptron_test(perceptron_train(c1_c3_train_data, MAX_ITER), c1_c3_train_data)
 
+            # Get predicted labels for test data for each binary classification 
             y_pred_c1_c2_test = perceptron_test(perceptron_train(c1_c2_train_data, MAX_ITER), c1_c2_test_data)
             y_pred_c2_c3_test = perceptron_test(perceptron_train(c2_c3_train_data, MAX_ITER), c2_c3_test_data)
             y_pred_c1_c3_test = perceptron_test(perceptron_train(c1_c3_train_data, MAX_ITER), c1_c3_test_data)
