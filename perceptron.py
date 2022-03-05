@@ -5,8 +5,8 @@ Binary and Multi-class Perceptron
 import numpy as np
 import pandas as pd
 
-SEED = 29
-# SEED = 24
+SEED = 6
+# SEED = 3
 
 MAX_ITER = 20
 
@@ -115,7 +115,7 @@ def accuracy_score(y_pred, y_true):
     return np.round((np.mean(y_pred == y_true))*100, 2)
 
 
-def perceptron_train(cleaned_train_data, MaxIter, l2_regularisation=False, l2_lambda=0):
+def perceptron_train(cleaned_train_data, max_iter, l2_regularisation=False, l2_lambda=0):
     """Perceptron training function for calculating the model parameters
 
     Args:
@@ -127,16 +127,18 @@ def perceptron_train(cleaned_train_data, MaxIter, l2_regularisation=False, l2_la
     Returns:
         model parameters: bias and weights for the trained model
     """
-    # set random seed for reproducing the results later
-    np.random.seed(SEED)
-
     # initialise weights as a numpy array of length same as input features, initialised to values 0
     weights = np.zeros(cleaned_train_data.shape[1] - 1)
     # Initialies bias to 0
     bias = 0
 
     # Run 'MaxIter' training iterations 
-    for _ in range(MaxIter):
+    for _ in range(max_iter):
+        # set random seed for reproducing the results later
+        np.random.seed(SEED)
+        # Shuffle the order of the data sets randomly for each epoch, for better train results
+        np.random.shuffle(cleaned_train_data)
+
         for data in cleaned_train_data:
             # Separate the input data features for each data point
             input = data[:-1]
@@ -168,7 +170,6 @@ def perceptron_test(model_params, cleaned_test_data, multi_class=False):
     Returns:
         numpy array: Return an array of predicted labels
     """
-    np.random.seed(SEED)
     y_pred = np.zeros(len(cleaned_test_data))
     bias, weights = model_params
     for data in cleaned_test_data:
@@ -192,13 +193,13 @@ def perceptron_test(model_params, cleaned_test_data, multi_class=False):
 
 if __name__ == '__main__':
 
-    # set random seed for reproducing the results later
-    np.random.seed(SEED)
-
     # load the training data and convert it to numpy array
     train_data = np.array(pd.read_csv('train.data', header=None))
     # load the testing data and convert it to numpy array
     test_data = np.array(pd.read_csv('test.data', header=None))
+
+    # set random seed for reproducing the results later
+    np.random.seed(SEED)
 
     # Shuffle the order of the data sets randomly, for better train results
     np.random.shuffle(train_data)
@@ -217,14 +218,14 @@ if __name__ == '__main__':
             c1_c3_train_data, c1_c3_test_data = clean_data(train_data, test_data, user_choice, 'class-1', 'class-3')
 
             # Get predicted labels for train data for each binary classification 
-            y_pred_c1_c2_train = perceptron_test(perceptron_train(c1_c2_train_data, MAX_ITER), c1_c2_train_data)
-            y_pred_c2_c3_train = perceptron_test(perceptron_train(c2_c3_train_data, MAX_ITER), c2_c3_train_data)
-            y_pred_c1_c3_train = perceptron_test(perceptron_train(c1_c3_train_data, MAX_ITER), c1_c3_train_data)
+            y_pred_c1_c2_train = perceptron_test(perceptron_train(c1_c2_train_data.copy(), MAX_ITER), c1_c2_train_data)
+            y_pred_c2_c3_train = perceptron_test(perceptron_train(c2_c3_train_data.copy(), MAX_ITER), c2_c3_train_data)
+            y_pred_c1_c3_train = perceptron_test(perceptron_train(c1_c3_train_data.copy(), MAX_ITER), c1_c3_train_data)
 
             # Get predicted labels for test data for each binary classification 
-            y_pred_c1_c2_test = perceptron_test(perceptron_train(c1_c2_train_data, MAX_ITER), c1_c2_test_data)
-            y_pred_c2_c3_test = perceptron_test(perceptron_train(c2_c3_train_data, MAX_ITER), c2_c3_test_data)
-            y_pred_c1_c3_test = perceptron_test(perceptron_train(c1_c3_train_data, MAX_ITER), c1_c3_test_data)
+            y_pred_c1_c2_test = perceptron_test(perceptron_train(c1_c2_train_data.copy(), MAX_ITER), c1_c2_test_data)
+            y_pred_c2_c3_test = perceptron_test(perceptron_train(c2_c3_train_data.copy(), MAX_ITER), c2_c3_test_data)
+            y_pred_c1_c3_test = perceptron_test(perceptron_train(c1_c3_train_data.copy(), MAX_ITER), c1_c3_test_data)
 
             # Output accuracy scores for test and train data
             print('Accuracy Score for class-1 v/s class-2 for train data:', accuracy_score(y_pred_c1_c2_train, c1_c2_train_data[:,-1]))
@@ -239,16 +240,16 @@ if __name__ == '__main__':
             train_data_list = clean_data(train_data, test_data, user_choice)
 
             # Get predictions (activation scores) for train data from each 1 v/s rest model
-            y_pred_1_train = perceptron_test(perceptron_train(train_data_list[0], MAX_ITER), train_data, True)
-            y_pred_2_train = perceptron_test(perceptron_train(train_data_list[1], MAX_ITER), train_data, True)
-            y_pred_3_train = perceptron_test(perceptron_train(train_data_list[2], MAX_ITER), train_data, True)
+            y_pred_1_train = perceptron_test(perceptron_train(train_data_list[0].copy(), MAX_ITER), train_data, True)
+            y_pred_2_train = perceptron_test(perceptron_train(train_data_list[1].copy(), MAX_ITER), train_data, True)
+            y_pred_3_train = perceptron_test(perceptron_train(train_data_list[2].copy(), MAX_ITER), train_data, True)
            
             # Get predictions (activation scores) for test data from each 1 v/s rest model
-            y_pred_1_test = perceptron_test(perceptron_train(train_data_list[0], MAX_ITER), test_data, True)
-            y_pred_2_test = perceptron_test(perceptron_train(train_data_list[1], MAX_ITER), test_data, True)
-            y_pred_3_test = perceptron_test(perceptron_train(train_data_list[2], MAX_ITER), test_data, True)
+            y_pred_1_test = perceptron_test(perceptron_train(train_data_list[0].copy(), MAX_ITER), test_data, True)
+            y_pred_2_test = perceptron_test(perceptron_train(train_data_list[1].copy(), MAX_ITER), test_data, True)
+            y_pred_3_test = perceptron_test(perceptron_train(train_data_list[2].copy(), MAX_ITER), test_data, True)
                 
-            # Vertically stack each array of predictions from each model
+            # Vertically stack each array of predictions from each model.copy()
             y_pred_train_stack = np.vstack((y_pred_1_train, y_pred_2_train, y_pred_3_train)).T
             y_pred_test_stack = np.vstack((y_pred_1_test, y_pred_2_test, y_pred_3_test)).T
 
@@ -277,14 +278,14 @@ if __name__ == '__main__':
             for l2_lambda in l2_lambda_list:
 
                 # Get predictions (activation scores) for train data for each L2 Lambda coefficient
-                y_pred_1_train = perceptron_test(perceptron_train(train_data_list[0], MAX_ITER, True, l2_lambda), train_data, True)
-                y_pred_2_train = perceptron_test(perceptron_train(train_data_list[1], MAX_ITER, True, l2_lambda), train_data, True)
-                y_pred_3_train = perceptron_test(perceptron_train(train_data_list[2], MAX_ITER, True, l2_lambda), train_data, True)
+                y_pred_1_train = perceptron_test(perceptron_train(train_data_list[0].copy(), MAX_ITER, True, l2_lambda), train_data, True)
+                y_pred_2_train = perceptron_test(perceptron_train(train_data_list[1].copy(), MAX_ITER, True, l2_lambda), train_data, True)
+                y_pred_3_train = perceptron_test(perceptron_train(train_data_list[2].copy(), MAX_ITER, True, l2_lambda), train_data, True)
 
                 # Get predictions (activation scores) for test data for each L2 Lambda coefficient
-                y_pred_1_test = perceptron_test(perceptron_train(train_data_list[0], MAX_ITER, True, l2_lambda), test_data, True)
-                y_pred_2_test = perceptron_test(perceptron_train(train_data_list[1], MAX_ITER, True, l2_lambda), test_data, True)
-                y_pred_3_test = perceptron_test(perceptron_train(train_data_list[2], MAX_ITER, True, l2_lambda), test_data, True)
+                y_pred_1_test = perceptron_test(perceptron_train(train_data_list[0].copy(), MAX_ITER, True, l2_lambda), test_data, True)
+                y_pred_2_test = perceptron_test(perceptron_train(train_data_list[1].copy(), MAX_ITER, True, l2_lambda), test_data, True)
+                y_pred_3_test = perceptron_test(perceptron_train(train_data_list[2].copy(), MAX_ITER, True, l2_lambda), test_data, True)
 
                 # Vertically stack each array of predictions from each model
                 y_pred_train_stack = np.vstack((y_pred_1_train, y_pred_2_train, y_pred_3_train)).T
@@ -302,8 +303,3 @@ if __name__ == '__main__':
                 # Output accuracy scores for test and train data
                 print(f'Multiclass Accuracy score for train data for lambda {l2_lambda}:', accuracy_score(y_pred_train, y_true_train))
                 print(f'Multiclass Accuracy score for test  data for lambda {l2_lambda}:', accuracy_score(y_pred_test, y_true_test))
-
-  
-
-    
-
