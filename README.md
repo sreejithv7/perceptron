@@ -1,0 +1,3 @@
+- This code implements a binary classification `Perceptron` algorithm.
+- Uses the same binary perceptron to implement a multiclass classifier using the `1-vs-Rest` approach
+- Added optional `L2` regularisation, to the multiclass classifier
